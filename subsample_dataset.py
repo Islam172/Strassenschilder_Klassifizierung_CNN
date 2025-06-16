@@ -11,7 +11,7 @@ from collections import defaultdict
 # === KONFIGURATION ===
 SOURCE_DIR = Path("/Users/mac/Downloads/OgreImagesOnly/OgreImagesOnly/Ogre")   # Ursprungsordner
 TARGET_DIR = Path("/Users/mac/Desktop/Ogre_subsample") # Zielordner
-MAX_PER_CLASS = 50                  # Max. Bilder pro Klasse
+MAX_PER_CLASS = 200                  # Max. Bilder pro Klasse
 
 # Zielordner neu anlegen
 if TARGET_DIR.exists():
