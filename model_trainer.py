@@ -1,4 +1,4 @@
-#Author: Gerhard Horst Reglich
+# Author: Gerhard Horst Reglich / Islam Elmaaroufi
 
 import os
 import numpy as np
@@ -9,17 +9,19 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 import torchvision.models as models
 from tqdm import tqdm
+from sklearn.metrics import precision_score, recall_score, f1_score
+import json
 
 # === CONFIGURATION ===
 data_dir = "/Users/mac/Desktop/Nachher"
 model_dir = os.path.join(data_dir, "models")
 os.makedirs(model_dir, exist_ok=True)
-model_path = os.path.join(model_dir, "model_traffic_signs.pth")
-
+model_path = os.path.join(model_dir, "model_traffic_signs1.pth")
+metrics_path = os.path.join(model_dir, "training_metrics.json")
 
 batch_size = 32
 num_epochs = 10
-learning_rate = 0.0001
+learning_rate = 0.0005
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # === LOAD DATA ===
@@ -53,6 +55,14 @@ model = model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
+# === METRICS CONTAINER ===
+metrics = {
+    "val_accuracy": [],
+    "precision": [],
+    "recall": [],
+    "f1_score": []
+}
+
 # === TRAIN LOOP ===
 for epoch in range(num_epochs):
     model.train()
@@ -72,9 +82,12 @@ for epoch in range(num_epochs):
 
     print(f"[{epoch+1}/{num_epochs}] Loss: {running_loss:.4f}")
 
-    # Validation Accuracy
+    # === VALIDATION METRICS ===
     model.eval()
     correct = total = 0
+    all_preds = []
+    all_labels = []
+
     with torch.no_grad():
         for images, labels in val_loader:
             images, labels = images.to(device), labels.to(device)
@@ -83,9 +96,27 @@ for epoch in range(num_epochs):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
+            all_preds.extend(predicted.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+
     acc = 100 * correct / total
-    print(f"Validation Accuracy: {acc:.2f}%")
+    precision = precision_score(all_labels, all_preds, average='macro')
+    recall = recall_score(all_labels, all_preds, average='macro')
+    f1 = f1_score(all_labels, all_preds, average='macro')
+
+    # Print & Save Metrics
+    print(f"Validation Accuracy: {acc:.2f}% | Precision: {precision:.4f} | Recall: {recall:.4f} | F1-Score: {f1:.4f}")
+
+    metrics["val_accuracy"].append(round(acc, 2))
+    metrics["precision"].append(round(precision, 4))
+    metrics["recall"].append(round(recall, 4))
+    metrics["f1_score"].append(round(f1, 4))
 
 # === SAVE MODEL ===
 torch.save(model.state_dict(), model_path)
 print(f"\nModell gespeichert unter: {model_path}")
+
+# === SAVE METRICS ===
+with open(metrics_path, "w") as f:
+    json.dump(metrics, f, indent=2)
+print(f"Metriken gespeichert unter: {metrics_path}")
