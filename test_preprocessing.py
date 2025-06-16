@@ -1,5 +1,7 @@
 #Author: Islam Elmaaroufi
 
+#Programm zu überprüfen, ob die Vorverarbeitung erfolgreich war.
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
