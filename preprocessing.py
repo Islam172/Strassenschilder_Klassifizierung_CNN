@@ -1,4 +1,4 @@
-#Author: Michael Schmidt / Islam Elmaaroufi
+#Author: Michael Schmidt / Islam Elmaaroufi (Unterstützung)
 
 import os
 import json
