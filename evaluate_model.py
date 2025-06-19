@@ -62,3 +62,18 @@ print(f"Accuracy:  {accuracy:.4f}")
 print(f"Precision: {precision:.4f}")
 print(f"Recall:    {recall:.4f}")
 print(f"F1-Score:  {f1:.4f}")
+
+#Ebgebnisse
+"""
+📊 TESTDATEN-METRIKEN
+==================================================
+Accuracy:  0.9658
+Precision: 0.9657
+Recall:    0.9658
+F1-Score:  0.9644
+
+"""
+
+
+
+
